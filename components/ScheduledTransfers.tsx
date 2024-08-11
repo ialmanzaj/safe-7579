@@ -52,8 +52,10 @@ export default function ScheduledTransfers ({
                   </div>
                 </div>
               </div>
+              <span>{transfer.args.jobId}</span>
               <button
                 onClick={() => {
+                  console.log('executeOrder-----', transfer.args.jobId)
                   executeOrder(transfer.args.jobId)
                 }}
               >

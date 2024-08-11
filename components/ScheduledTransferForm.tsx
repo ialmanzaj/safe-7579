@@ -12,11 +12,60 @@ const ScheduledTransferForm: React.FC<{ safe: SafeSmartAccountClient }> = ({
 }) => {
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState(0)
-  const [date, setDate] = useState('')
   const [txHash, setTxHash] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [is7579Installed, setIs7579Installed] = useState(false)
+
+  const [date, setDate] = useState('');
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Input changed. New value:', e.target.value);
+
+    const inputDateString = e.target.value;
+    if (inputDateString) {
+      console.log('Processing input date string:', inputDateString);
+
+      // Create a date object in the local timezone
+      const localDate = new Date(inputDateString);
+      console.log('Local Date object created:', localDate);
+
+      // Get the timestamp in milliseconds
+      const timestamp = localDate.getTime();
+      console.log('Local Timestamp (ms):', timestamp);
+
+      // Convert to Unix timestamp (seconds)
+      const unixTimestamp = Math.floor(timestamp / 1000);
+      console.log('Unix Timestamp (s):', unixTimestamp);
+
+      setDate(unixTimestamp.toString());
+
+      // Set debug info
+      const debugInfo = {
+        inputDateString,
+        localDateString: localDate.toString(),
+        localISOString: localDate.toISOString(),
+        timestamp,
+        unixTimestamp,
+        localTimezoneOffset: localDate.getTimezoneOffset(),
+        currentTimeUnix: Math.floor(Date.now() / 1000),
+        currentTimeLocal: new Date().toString(),
+        currentTimeUTC: new Date().toUTCString()
+      };
+      console.log('Debug Info:', debugInfo);
+
+    } else {
+      console.log('Input cleared');
+      setDate('');
+
+    }
+  };
+
+  const formatDateForInput = (unixTimestamp: string) => {
+    if (!unixTimestamp) return '';
+    const date = new Date(parseInt(unixTimestamp) * 1000);
+    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+  };
 
   useEffect(() => {
     const init7579Module = async () => {
@@ -79,10 +128,10 @@ const ScheduledTransferForm: React.FC<{ safe: SafeSmartAccountClient }> = ({
           <label htmlFor='date'>Date/Time:</label>
           <input
             style={{ marginLeft: '20px' }}
-            id='date'
-            type='datetime-local'
-            onChange={e => setDate(e.target.value)}
-            value={date}
+            id="date"
+            type="datetime-local"
+            onChange={handleDateChange}
+            value={formatDateForInput(date)}
           />
         </div>
 
@@ -91,9 +140,10 @@ const ScheduledTransferForm: React.FC<{ safe: SafeSmartAccountClient }> = ({
           onClick={async () => {
             setLoading(true)
             setError(false)
-            const startDate = new Date(date).getTime() / 1000
+            console.log('startDate', date)
+
             const transferInputData = {
-              startDate: 1710759572,
+              startDate: Number(date),
               repeatEvery: 60 * 60 * 24,
               numberOfRepeats: 1,
               amount,

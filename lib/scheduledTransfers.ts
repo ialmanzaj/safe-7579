@@ -18,7 +18,8 @@ export interface ScheduledTransferDataInput {
 
 export const scheduledTransfersModuleAddress =
   '0xF1aE317941efeb1ffB103D959EF58170F1e577E0'
-const sepoliaUSDCTokenAddress = '0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8'
+const USDCTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+console.log('USDCTokenAddress', USDCTokenAddress)
 
 export const install7579Module = async (
   safe: SafeSmartAccountClient,
@@ -31,28 +32,33 @@ export const install7579Module = async (
     repeatEvery,
     numberOfRepeats,
     token: {
-      token_address: sepoliaUSDCTokenAddress as `0x${string}`,
+      token_address: USDCTokenAddress as `0x${string}`,
       decimals: 6
     },
     amount,
     recipient
   }
+  console.log('scheduledTransfer', scheduledTransfer)
 
   const executionData = getScheduledTransferData({
     scheduledTransfer
   })
+  console.log('executionData', executionData)
 
-  const scheduledTransfersModule = getScheduledTransfersExecutor({
+  const scheduledTransfersExecutor = getScheduledTransfersExecutor({
     executeInterval: repeatEvery,
     numberOfExecutions: numberOfRepeats,
     startDate,
     executionData
   })
 
+
+  console.log('scheduledTransfersExecutor', scheduledTransfersExecutor)
+
   const txHash = await safe.installModule({
     type: 'executor',
     address: scheduledTransfersModuleAddress,
-    context: scheduledTransfersModule.initData as `0x${string}`
+    context: scheduledTransfersExecutor.initData as `0x${string}`
   })
 
   console.log(
@@ -69,17 +75,19 @@ export const scheduleTransfer = async (
 ) => {
   const { startDate, repeatEvery, numberOfRepeats, amount, recipient } =
     scheduledTransferInput
+  console.log('startDate', startDate)
   const scheduledTransfer = {
     startDate,
     repeatEvery,
     numberOfRepeats,
     token: {
-      token_address: sepoliaUSDCTokenAddress as `0x${string}`,
+      token_address: USDCTokenAddress as `0x${string}`,
       decimals: 6
     },
     amount,
     recipient
   }
+  console.log('scheduledTransfer', scheduledTransfer)
 
   const scheduledTransferData = getCreateScheduledTransferAction({
     scheduledTransfer
@@ -97,7 +105,8 @@ export const scheduleTransfer = async (
 }
 
 export const executeOrder = async (jobId: number) => {
+  console.log('jobId', jobId)
   const executeTransfer = getExecuteScheduledTransferAction({ jobId })
-  console.log(executeTransfer)
+  console.log('executeTransfer', executeTransfer)
   return executeTransfer
 }

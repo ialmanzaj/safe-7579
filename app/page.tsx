@@ -28,8 +28,9 @@ export default function Home () {
       address: scheduledTransfersModuleAddress,
       abi,
       // eventName: 'ExecutionAdded', // Optional
-      // args: { smartAccount: safe?.account.address }, // Optional
+      args: { smartAccount: safe?.account.address }, // Optional
       onLogs: logs => {
+        console.log('logs', logs)
         setLogs(_logs => [
           ..._logs,
           ...logs.filter(
@@ -40,7 +41,7 @@ export default function Home () {
       }
     })
     return () => unwatch()
-    // }, [safe]) // Optional
+    //}, [safe]) // Optional
   }, [])
 
   return (
